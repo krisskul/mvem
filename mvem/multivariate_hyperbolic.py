@@ -13,6 +13,14 @@ def rvs(chi, psi, mu, sigma, gamma, size):
     lmbda = (len(mu)+1)/2
     return ghypmv.rvs(lmbda, chi, psi, mu, sigma, gamma, size)
 
+def mean(chi, psi, mu, sigma, gamma):
+    lmbda = (len(mu)+1)/2
+    return ghypmv.mean(lmbda, chi, psi, mu, sigma, gamma)
+
+def var(chi, psi, mu, sigma, gamma):
+    lmbda = (len(mu)+1)/2
+    return ghypmv.var(lmbda, chi, psi, mu, sigma, gamma)
+
 def fit(x, alpha_bar=1, symmetric=False, standardize=False, nit=2000, reltol=1e-8,
         abstol=1e-7, silent=False, fmu=None, fsigma=None, fgamma=None):
     

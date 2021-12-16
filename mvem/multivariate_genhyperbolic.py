@@ -104,6 +104,46 @@ def rvs(lmbda, chi, psi, mu, sigma, gamma, size):
     W = gig.rvs(lmbda, chi, psi, size)
     return np.sqrt(W)[:, None] * (Z @ A) + mu + np.outer(W, gamma)
 
+def mean(lmbda, chi, psi, mu, sigma, gamma):
+    if psi==0: # gig -> invgamma        
+        if lmbda > -1:
+            raise Exception("Mean for psi==0 is only defined for lambda < -1")
+        alpha = -lmbda
+        beta = 0.5*chi
+        EW = beta/(alpha-1)
+    elif psi>0:
+        if chi==0: # gig -> gamma
+            alpha = lmbda 
+            beta = 0.5*psi
+            EW = beta/alpha
+        elif chi>0: # gig
+            alpha = np.sqrt(chi*psi)
+            EW = np.sqrt(chi/psi) * kv(lmbda+1, alpha) / kv(lmbda, alpha)
+
+    return mu + EW*gamma
+
+def var(lmbda, chi, psi, mu, sigma, gamma):
+    if psi==0: # gig -> invgamma
+        if lmbda > -2:
+            raise Exception("Var for psi==0 is only defined for lambda < -2")
+        alpha = -lmbda
+        beta = 0.5*chi
+        EW = beta/(alpha-1)
+        VarW = beta**2 / ((alpha-1)**2 * (alpha-2))
+    elif psi>0:
+        if chi==0: # gig -> gamma
+            alpha = lmbda 
+            beta = 0.5*psi
+            EW = beta/alpha
+            VarW = alpha/(beta**2)
+        elif chi>0: # gig
+            alpha = np.sqrt(chi*psi)
+            EW = np.sqrt(chi/psi) * kv(lmbda+1, alpha) / kv(lmbda, alpha)
+            EW2 = (chi/psi) * kv(lmbda+2, alpha) / kv(lmbda, alpha)
+            VarW = EW2 - EW**2
+
+    return VarW * np.outer(gamma, gamma) + EW * sigma
+
 from .gig import _check_gig_pars
 
 # from (alpha_bar, lambda) parameterisation to (chi, psi)

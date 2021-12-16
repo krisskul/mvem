@@ -10,6 +10,12 @@ def pdf(x, lmbda, chi, mu, sigma, gamma):
 def rvs(lmbda, chi, mu, sigma, gamma, size):
     return ghypmv.rvs(lmbda, chi, 0, mu, sigma, gamma, size)
 
+def mean(lmbda, chi, mu, sigma, gamma):
+    return ghypmv.mean(lmbda, chi, 0, mu, sigma, gamma)
+
+def var(lmbda, chi, mu, sigma, gamma):
+    return ghypmv.var(lmbda, chi, 0, mu, sigma, gamma)
+
 def fit(x, lmbda=-1, symmetric=False, standardize=False, nit=2000, reltol=1e-8,
         abstol=1e-7, silent=False, fmu=None, fsigma=None, fgamma=None):
     
