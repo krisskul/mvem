@@ -87,9 +87,7 @@ def _besselM3(lmbda=9/2, x=2, logvalue=False):
             res = np.log(kv(lmbda, x))
     return res
 
-
-#Egig
-def gig_e(lmbda, chi, psi, func = "x"):
+def expect(lmbda, chi, psi, func = "x"):
     """
     Compute the expectation E[f(x)|lmbda, chi, psi],
     where f(x) is one of ["x", "logx", "1/x"].
@@ -102,8 +100,8 @@ def gig_e(lmbda, chi, psi, func = "x"):
     chi = np.asarray(chi)
     psi = np.asarray(psi)
     
-    for i in range(len(lmbda)):
-        _check_gig_pars(lmbda[i], chi[i], psi[i])
+    #for i in range(len(lmbda)):
+    #    _check_gig_pars(lmbda[i], chi[i], psi[i])
 
     chi_eps = 1e-8
 
@@ -151,9 +149,13 @@ def gig_e(lmbda, chi, psi, func = "x"):
             chi[chi == 0] = chi_eps
 
             # requires numerical calculations of the derivative of E[X**a] for a=sqrt(chi*psi)
-            p, b, loc, scale = _gig_to_scipy_params_(lmbda, chi, psi)
-            return scipy.stats.geninvgauss.expect(lambda x: np.log(x), args=(p,b), loc=loc, scale=scale)
-        
+            alpha_bar = np.sqrt(chi * psi)
+            besselKnu = lambda x, alpha_bar: kv(x, alpha_bar)
+            #Kderiv = np.concatenate([scipy.optimize.approx_fprime(lmbda, besselKnu, 1e-8, a) for a in alpha_bar])
+            step = 1e-8
+            Kderiv = (besselKnu(lmbda+step, alpha_bar) - besselKnu(lmbda-step, alpha_bar)) / (2*step)
+            return 0.5 * np.log(chi/psi) + Kderiv / kv(lmbda, alpha_bar)
+            
     elif func == "1/x":
         if np.all(psi == 0):
             # Inv Gamma -> Student-t
@@ -176,7 +178,7 @@ def gig_e(lmbda, chi, psi, func = "x"):
             return np.exp(term1 + term2 - term3)
     
 
-def gig_var(lmbda, chi, psi):
+def var(lmbda, chi, psi):
     """
     Compute the variance of a GIG distribution with parameters
     (lmbda, chi, psi). When psi==0, the distribution is the inverse
