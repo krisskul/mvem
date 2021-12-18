@@ -9,6 +9,9 @@ def pdf(x, loc, shape, df, allow_singular=False):
 def logpdf(x, loc, shape, df, allow_singular=False):
     return multivariate_t.logpdf(x, loc, shape, df, allow_singular)
 
+def loglike(x, loc, shape, df):
+    return np.sum(logpdf(x, loc, shape, df))
+
 def rvs(loc, shape, df, size=1, random_state=None):
     return multivariate_t.rvs(loc, shape, df, size, random_state)
 

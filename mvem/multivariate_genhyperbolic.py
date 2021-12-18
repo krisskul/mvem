@@ -95,6 +95,9 @@ def logpdf(x, lmbda, chi, psi, mu, sigma, gamma):
 def pdf(x, lmbda, chi, psi, mu, sigma, gamma):
     return np.exp(logpdf(x, lmbda, chi, psi, mu, sigma, gamma))
 
+def loglike(x, lmbda, chi, psi, mu, sigma, gamma):
+    return np.sum(logpdf(x, chi, lmbda, psi, mu, sigma, gamma))
+
 def rvs(lmbda, chi, psi, mu, sigma, gamma, size):
     d = len(mu)
     Z = scipy.stats.norm.rvs(size=size*d).reshape((-size,d))

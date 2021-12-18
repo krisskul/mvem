@@ -12,6 +12,9 @@ def pdf(x, mean, cov, allow_singular=False):
 def logpdf(x, mean, cov, allow_singular=False):
     return multivariate_normal.logpdf(x, mean, cov, allow_singular)
 
+def loglike(x, mean, cov):
+    return np.sum(logpdf(x, mean, cov))
+
 def cdf(x, mean, cov, allow_singular=False, maxpts=1000000, abseps=1e-5, releps=1e-5):
     maxpts = maxpts * x.shape[1]
     return multivariate_normal.cdf(x, mean, cov, allow_singular, maxpts, abseps, releps)

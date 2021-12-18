@@ -9,6 +9,9 @@ def pdf(x, chi, psi, mu, sigma, gamma):
     lmbda = (len(mu)+1)/2
     return ghypmv.pdf(x, lmbda, chi, psi, mu, sigma, gamma)
 
+def loglike(x, chi, psi, mu, sigma, gamma):
+    return np.sum(logpdf(x, chi, psi, mu, sigma, gamma))
+
 def rvs(chi, psi, mu, sigma, gamma, size):
     lmbda = (len(mu)+1)/2
     return ghypmv.rvs(lmbda, chi, psi, mu, sigma, gamma, size)

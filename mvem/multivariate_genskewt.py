@@ -7,6 +7,9 @@ def logpdf(x, lmbda, chi, mu, sigma, gamma):
 def pdf(x, lmbda, chi, mu, sigma, gamma):
     return ghypmv.pdf(x, lmbda, chi, 0, mu, sigma, gamma)
 
+def loglike(x, lmbda, chi, mu, sigma, gamma):
+    return np.sum(logpdf(x, lmbda, chi, mu, sigma, gamma))
+
 def rvs(lmbda, chi, mu, sigma, gamma, size):
     return ghypmv.rvs(lmbda, chi, 0, mu, sigma, gamma, size)
 

@@ -54,6 +54,9 @@ def logpdf(x, mu, sigma, lmbda):
 def pdf(x, mu, sigma, lmbda):
     return np.exp(logpdf(x, mu, sigma, lmbda))
 
+def loglike(x, mu, sigma, lmbda):
+    return np.sum(logpdf(x, mu, sigma, lmbda))
+
 def rvs(mu, sigma, lmbda, size=1):
     mu, sigma, lmbda = _check_params(mu, sigma, lmbda)
 
