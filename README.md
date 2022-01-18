@@ -24,10 +24,6 @@ from mvem.stats import multivariate_norminvgauss
 params = multivariate_norminvgauss.fit(x)
 ```
 
-## Example
-
-!["alt"](assets/msn.png "Title")
-
 ## Current library structure:
 
 ```
