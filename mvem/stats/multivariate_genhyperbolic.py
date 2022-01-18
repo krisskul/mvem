@@ -6,6 +6,27 @@ from . import gig
 import warnings
 
 def logpdf(x, lmbda, chi, psi, mu, sigma, gamma):
+    """
+    Log-probability density function of the generalised hyperbolic distribution.
+    We use the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
+
+    Parameters
+    ----------
+    x: np.ndarray
+        (n, p) array of n p-variate observations
+    lmbda: float
+        lmbda is real
+    chi: float
+        chi > 0
+    psi: float
+        psi > 0
+    mu: np.ndarray or list
+        (p,) array
+    sigma: np.ndarray or list
+        (p, p) positive semi-definite array
+    gamma: np.ndarray or list
+        (p,) array
+    """
 
     ## Density of a multivariate generalized hyperbolic distribution.
     ## Covers all special cases as well.
@@ -93,12 +114,75 @@ def logpdf(x, lmbda, chi, psi, mu, sigma, gamma):
     return out
 
 def pdf(x, lmbda, chi, psi, mu, sigma, gamma):
+    """
+    Probability density function of the generalised hyperbolic distribution.
+    We use the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
+
+    Parameters
+    ----------
+    x: np.ndarray
+        (n, p) array of n p-variate observations
+    lmbda: float
+        lmbda is real
+    chi: float
+        chi > 0
+    psi: float
+        psi > 0
+    mu: np.ndarray or list
+        (p,) array
+    sigma: np.ndarray or list
+        (p, p) positive semi-definite array
+    gamma: np.ndarray or list
+        (p,) array
+    """
     return np.exp(logpdf(x, lmbda, chi, psi, mu, sigma, gamma))
 
 def loglike(x, lmbda, chi, psi, mu, sigma, gamma):
+    """
+    Log-likelihood function of the generalised hyperbolic distribution.
+    We use the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
+
+    Parameters
+    ----------
+    x: np.ndarray
+        (n, p) array of n p-variate observations
+    lmbda: float
+        lmbda is real
+    chi: float
+        chi > 0
+    psi: float
+        psi > 0
+    mu: np.ndarray or list
+        (p,) array
+    sigma: np.ndarray or list
+        (p, p) positive semi-definite array
+    gamma: np.ndarray or list
+        (p,) array
+    """
     return np.sum(logpdf(x, chi, lmbda, psi, mu, sigma, gamma))
 
 def rvs(lmbda, chi, psi, mu, sigma, gamma, size):
+    """
+    Random number generator of the generalised hyperbolic distribution.
+    We use the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
+
+    Parameters
+    ----------
+    lmbda: float
+        lmbda is real
+    chi: float
+        chi > 0
+    psi: float
+        psi > 0
+    mu: np.ndarray or list
+        (p,) array
+    sigma: np.ndarray or list
+        (p, p) positive semi-definite array
+    gamma: np.ndarray or list
+        (p,) array
+    size: int
+        number of samples to draw
+    """
     d = len(mu)
     Z = scipy.stats.norm.rvs(size=size*d).reshape((-size,d))
     A = np.linalg.cholesky(sigma)
@@ -108,6 +192,25 @@ def rvs(lmbda, chi, psi, mu, sigma, gamma, size):
     return np.sqrt(W)[:, None] * (Z @ A) + mu + np.outer(W, gamma)
 
 def mean(lmbda, chi, psi, mu, sigma, gamma):
+    """
+    Mean function of the generalised hyperbolic distribution. We use
+    the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
+
+    Parameters
+    ----------
+    lmbda: float
+        lmbda is real
+    chi: float
+        chi > 0
+    psi: float
+        psi > 0
+    mu: np.ndarray or list
+        (p,) array
+    sigma: np.ndarray or list
+        (p, p) positive semi-definite array
+    gamma: np.ndarray or list
+        (p,) array
+    """
     if psi==0: # gig -> invgamma        
         if lmbda > -1:
             raise Exception("Mean for psi==0 is only defined for lambda < -1")
@@ -126,6 +229,25 @@ def mean(lmbda, chi, psi, mu, sigma, gamma):
     return mu + EW*gamma
 
 def var(lmbda, chi, psi, mu, sigma, gamma):
+    """
+    Variance function of the generalised hyperbolic distribution. We use
+    the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
+
+    Parameters
+    ----------
+    lmbda: float
+        lmbda is real
+    chi: float
+        chi > 0
+    psi: float
+        psi > 0
+    mu: np.ndarray or list
+        (p,) array
+    sigma: np.ndarray or list
+        (p, p) positive semi-definite array
+    gamma: np.ndarray or list
+        (p,) array
+    """
     if psi==0: # gig -> invgamma
         if lmbda > -2:
             raise Exception("Var for psi==0 is only defined for lambda < -2")
@@ -383,14 +505,63 @@ def fitghypmv(
     aic = -2 * ll + 2 * nbr_fitted_params
 
     return {"lmbda": lmbda, "alpha_bar": alpha_bar, "mu": mu, "sigma": sigma, "gamma": gamma,
-            "ll": ll, "n_iter": i, "converged": converged, "aic": aic}
+            "ll": ll_save, "n_iter": i, "converged": converged, "aic": aic}
 
 
 
 def fit(x, lmbda=1, alpha_bar=1, symmetric=False, standardize=False, nit=2000,
         reltol=1e-8, abstol=1e-7, silent=False, flambda=None, falpha_bar=None,
-        fmu=None, fsigma=None, fgamma=None):
-    
+        fmu=None, fsigma=None, fgamma=None, return_loglike=False):
+    """
+    Estimate the parameters of the generalised hyperbolic distribution. We
+    use the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
+
+    Parameters
+    ----------
+    x: np.ndarray
+        (n, p) array of n p-variate observations
+    lmbda: float
+        initial value of lmbda
+    alpha_bar
+        initial value of alpha_bar, a positive real number, where
+        alpha_bar = sqrt(chi * psi)
+    symmetric: boolean, optional
+        fit a symmetric distribution (default=False)
+    standardize: boolean, optional
+        standardize the data before fitting (default=False)
+    nit: int
+        maximum number of iterations in EM algorithm (default=2000)
+    reltol: float
+        relative convergence criterion for log-likelihood (default=1e-8)
+    abstol: float
+        absolute convergence criterion for log-likelihood (default=1e-7)
+    silent: boolean
+        print likelihoods during fitting (default=False)
+    flambda: float or None
+        if flmabda!=None, force lambda to flambda (default=None)
+    falpha_bar: float or None
+        if falpha_bar!=None, force alpha_bar to falpha_bar, where
+        alpha_bar = sqrt(chi * psi) (default=None)
+    fmu: float or None
+        if fmu!=None, force mu to fmu (default=None)
+    fsigma: float or None
+        if fsigma!=None, force sigma to fsigma (default=None)
+    fgamma: float or None
+        if fgamma!=None, force gamma to fgamma (default=None)
+    return_loglike: boolean
+        return log-likelihood values (default=False)
+
+    Returns
+    -------
+    lmbda: float
+    chi: float
+    psi: float
+    mu: np.ndarray
+    sigma: np.ndarray
+    gamma: np.ndarray
+    log_likelihoods: list (returned if return_loglike = True)
+    """
+
     opt_pars = {"lmbda": flambda is None, "alpha_bar": falpha_bar is None,
                 "mu": fmu is None, "sigma": fsigma is None, "gamma": fgamma is None}
 
@@ -401,5 +572,15 @@ def fit(x, lmbda=1, alpha_bar=1, symmetric=False, standardize=False, nit=2000,
         x, lmbda=lmbda, alpha_bar=alpha_bar, mu=fmu, sigma=fsigma, gamma=fgamma,
         symmetric=symmetric, standardize=standardize, nit=nit, reltol=reltol,
         abstol=abstol, silent=silent, opt_pars=opt_pars)
-    
-    return fit
+
+    if fit["alpha_bar"] != 0:
+        chi, psi = _alphabar2chipsi(fit["alpha_bar"], fit["lmbda"])
+    elif fit["alpha_bar"]==0 and fit["lmbda"] > 0:
+         chi, psi = 0, 2 * fit["lmbda"]
+    elif fit["alpha_bar"]==0 and fit["lmbda"] < 0:
+         chi, psi = -2 * (fit["lmbda"] + 1), 0
+
+    if return_loglike:
+        return fit["lmbda"], chi, psi, fit["mu"], fit["sigma"], fit["gamma"], fit["ll"]
+    return fit["lmbda"], chi, psi, fit["mu"], fit["sigma"], fit["gamma"]
+

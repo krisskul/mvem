@@ -15,6 +15,15 @@ Currently included:
 I am also working on including a few multivariate mixture models. Currently included:
 - skew normal (```mvem.mixture.skewnorm```)
 
+## Quickstart
+
+```python
+from mvem.stats import multivariate_norminvgauss
+
+# assume p-variate data x
+params = multivariate_norminvgauss.fit(x)
+```
+
 ## Example
 
 !["alt"](assets/msn.png "Title")

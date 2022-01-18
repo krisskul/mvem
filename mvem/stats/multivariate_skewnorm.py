@@ -3,8 +3,6 @@ from scipy.stats import (multivariate_normal as mvn, norm)
 from scipy.stats._multivariate import _squeeze_output
 import scipy
 
-# See: http://gregorygundersen.com/blog/2020/12/29/multivariate-skew-normal/
-
 def _check_params(mu, sigma, lmbda):    
     mu = np.asarray(mu)
     sigma = np.asarray(sigma)
@@ -24,7 +22,19 @@ def _check_params(mu, sigma, lmbda):
     
     return mu, sigma, lmbda
 
-def mean(mu, sigma, lmbda):    
+def mean(mu, sigma, lmbda):
+    """
+    Mean function of the multivariate skew normal distribution.
+
+    Parameters
+    ----------
+    mu: np.ndarray or list
+        (p,) array of location parameters
+    sigma: np.ndarray or list
+        (p, p) positive semi-definite array of scale parameters
+    lmbda: np.ndarray or list
+        (p,) array of skewness parameters
+    """
     mu, sigma, lmbda = _check_params(mu, sigma, lmbda)    
 
     val, vec = np.linalg.eig(sigma)
@@ -33,14 +43,40 @@ def mean(mu, sigma, lmbda):
     return mu + np.sqrt(2/np.pi) * sigma_half @ delta
 
 def var(mu, sigma, lmbda):
+    """
+    Variance function of the multivariate skew normal distribution.
+
+    Parameters
+    ----------
+    mu: np.ndarray or list
+        (p,) array of location parameters
+    sigma: np.ndarray or list
+        (p, p) positive semi-definite array of scale parameters
+    lmbda: np.ndarray or list
+        (p,) array of skewness parameters
+    """
     mu, sigma, lmbda = _check_params(mu, sigma, lmbda)
     
     val, vec = np.linalg.eig(sigma)
     sigma_half = vec @ np.diag(val**(1/2)) @ vec.T
-    delta = _delta(lmbda)
+    delta = lmbda / np.sqrt(1 + np.sum(lmbda**2))
     return sigma - (2/np.pi) * sigma_half @ delta @ delta.T @ sigma_half
 
-def logpdf(x, mu, sigma, lmbda):    
+def logpdf(x, mu, sigma, lmbda):
+    """
+    Log-probability density function of the multivariate skew normal distribution.
+
+    Parameters
+    ----------
+    x: np.ndarray
+        (n, p) array of n p-variate observations
+    mu: np.ndarray or list
+        (p,) array of location parameters
+    sigma: np.ndarray or list
+        (p, p) positive semi-definite array of scale parameters
+    lmbda: np.ndarray or list
+        (p,) array of skewness parameters
+    """
     mu, sigma, lmbda = _check_params(mu, sigma, lmbda)
     
     x    = mvn._process_quantiles(x, len(mu))
@@ -52,12 +88,54 @@ def logpdf(x, mu, sigma, lmbda):
     return _squeeze_output(np.log(2) + pdf + cdf)
 
 def pdf(x, mu, sigma, lmbda):
+    """
+    Probability density function of the multivariate skew normal distribution.
+
+    Parameters
+    ----------
+    x: np.ndarray
+        (n, p) array of n p-variate observations
+    mu: np.ndarray or list
+        (p,) array of location parameters
+    sigma: np.ndarray or list
+        (p, p) positive semi-definite array of scale parameters
+    lmbda: np.ndarray or list
+        (p,) array of skewness parameters
+    """
     return np.exp(logpdf(x, mu, sigma, lmbda))
 
 def loglike(x, mu, sigma, lmbda):
+    """
+    Log-likelihood function of the multivariate skew normal distribution.
+
+    Parameters
+    ----------
+    x: np.ndarray
+        (n, p) array of n p-variate observations
+    mu: np.ndarray or list
+        (p,) array of location parameters
+    sigma: np.ndarray or list
+        (p, p) positive semi-definite array of scale parameters
+    lmbda: np.ndarray or list
+        (p,) array of skewness parameters
+    """
     return np.sum(logpdf(x, mu, sigma, lmbda))
 
 def rvs(mu, sigma, lmbda, size=1):
+    """
+    Random number generator of the multivariate skew normal distribution.
+
+    Parameters
+    ----------
+    mu: np.ndarray or list
+        (p,) array of location parameters
+    sigma: np.ndarray or list
+        (p, p) positive semi-definite array of scale parameters
+    lmbda: np.ndarray or list
+        (p,) array of skewness parameters
+    size: int
+        number of sample to draw
+    """
     mu, sigma, lmbda = _check_params(mu, sigma, lmbda)
 
     # switch to (Omega, alpha) parameterization
@@ -78,7 +156,33 @@ def rvs(mu, sigma, lmbda, size=1):
     return x1 + mu.T
 
 
-def fit(x, maxiter = 100, ptol = 1e-6, ftol = np.inf, eps=0.9):
+def fit(x, maxiter = 100, ptol = 1e-6, ftol = np.inf, eps=0.9, return_loglike = False):
+    """
+    Estimate the parameters of the multivariate skew normal distribution
+    using an EM algorithm.
+
+    Parameters
+    ----------
+    x: np.ndarray
+        (n, p) array of n p-variate observations
+    maxiter: int
+        max nunber of iterations in the EM algorithm
+    ptol: float
+        convergence tolerance for parameters
+    ftol: float
+        convergence tolerance for log-likelihood
+    eps: float
+
+    return_loglike: boolean
+        whether to return the list of log-likelihoods
+
+    Returns
+    -------
+    mu: np.ndarray
+    scale: np.ndarray
+    nu: np.ndarray
+    log_likelihoods: list (returned if return_loglike = True)
+    """
 
     def _ll(xi, n, omega_inv_half, delta):
     
@@ -167,5 +271,6 @@ def fit(x, maxiter = 100, ptol = 1e-6, ftol = np.inf, eps=0.9):
     #inv_half = vec @ np.diag(val**(-1)) @ vec.T
     #lmbda0 = inv_half @ delta1 / np.sqrt(1 - np.sum(delta1**2))
     lmbda0 = delta1 / np.sqrt(1 - np.sum(delta1**2))
-    
-    return mu1, omega1, lmbda0, ll_val
+    if return_loglike:
+        return mu1, omega1, lmbda0, ll_val
+    return mu1, omega1, lmbda0
