@@ -1,23 +1,26 @@
 # Maximum Likelihood Estimation in Multivariate Probability Distributions Using EM Algorithms
 
-To my surprise, ```scipy.stats``` include very few multivariate probability distributions, and neither of the implemented distributions has an associated parameter estimation method. In contrast, R (:heart_eyes:) has more or less everything a statistician desires. Hence, if you are stuck with Python, this repository attempts to include parameter estimation methods for the most common continuous probability distributions using EM (or modified EM) algorithms.
+**mvem** is a Python package that provides maximum likelihood estimation methods for multivariate probability distributions using expectation–maximization (EM) algorithms. Additionally, it includes some functionality for fitting non-Gaussian multivariate mixture models. For fitting a wide range of univariate probability distributions, we refer to `scipy.stats`.
 
 Currently included:
-- normal (```mvem.stats.multivariate_norm```)
-- skew normal (```mvem.stats.multivariate_skewnorm```)
-- Student's *t* (```mvem.stats.multivariate_t```)
-- normal-inverse Gaussian (```mvem.stats.multivariate_norminvgauss```)
-- generalised hyperbolic skew Student's *t* (```mvem.stats.multivariate_genskewt```)
-- generalised hyperbolic (```mvem.stats.multivariate_genhyperbolic```)
-- hyperbolic (```mvem.stats.multivariate_hyperbolic```)
-- variance-gamma (```mvem.stats.multivariate_vargamma```)
+- normal (`mvem.stats.multivariate_norm`)
+- skew normal (`mvem.stats.multivariate_skewnorm`)
+- Student's *t* (`mvem.stats.multivariate_t`)
+- normal-inverse Gaussian (`mvem.stats.multivariate_norminvgauss`)
+- generalised hyperbolic skew Student's *t* (`mvem.stats.multivariate_genskewt`)
+- generalised hyperbolic (`mvem.stats.multivariate_genhyperbolic`)
+- hyperbolic (`mvem.stats.multivariate_hyperbolic`)
+- variance-gamma (`mvem.stats.multivariate_vargamma`)
 
-I am also working on including a few multivariate mixture models. Currently included:
-- skew normal (```mvem.mixture.skewnorm```)
+Multivariate mixture models currently included:
+- skew normal (`mvem.mixture.skewnorm`)
 
-## Installing
+## Where to get it
+The source code is currently hosted on GitHub at: https://github.com/krisskul/mvem
 
-```
+Binary installers for the latest released version are available at the [Python Package Index (PyPI)](https://pypi.org/project/mvem).
+
+```sh
 pip install mvem
 ```
 
@@ -27,22 +30,6 @@ pip install mvem
 from mvem.stats import multivariate_norminvgauss
 # assume p-variate data x
 params = multivariate_norminvgauss.fit(x)
-```
-
-## Current library structure:
-
-```
-mvem
-|_ stats
-   |_ multivariate_normal.py
-      |_ fit, pdf, logpdf, rvs, mean, var
-   |_ multivariate_t.py
-      |_ fit, pdf, logpdf, rvs, mean, var
-   ...
-|_ mixture
-   |_ skewnorm.py
-      |_ fit, pdf, rvs, predict
-   ...
 ```
 
 ## Requirements
