@@ -7,7 +7,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='mvem',
-    version='0.1',
+    version='0.1.1',
     license='wtfpl',
     author="Kristoffer Skuland",
     author_email='kristoffer.skuland@gmail.com',
