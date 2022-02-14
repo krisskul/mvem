@@ -7,7 +7,7 @@ long_description = (this_directory / 'README.md').read_text()
 
 setup(
     name='mvem',
-    version='0.1.2',
+    version='0.1.3',
     license='wtfpl',
     author='Kristoffer Skuland',
     author_email='kristoffer.skuland@gmail.com',
@@ -18,8 +18,9 @@ setup(
     install_requires=[
           'scikit-learn',
           'numpy',
-          'scipy>=1.6'
+          'scipy'
       ],
+    python_requires=">=3.6",
     description='Maximum likelihood estimation in multivariate probability distributions using EM algorithms',
     long_description=long_description,
     long_description_content_type='text/markdown',
