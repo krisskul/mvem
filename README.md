@@ -26,6 +26,8 @@ pip install mvem
 
 ## Quickstart
 
+Documentation and a few introductory notebooks are hosted at [readthedocs](https://mvem.readthedocs.io/en/latest/index.html).
+
 ```
 from mvem.stats import multivariate_norminvgauss
 # assume p-variate data x
@@ -34,8 +36,10 @@ params = multivariate_norminvgauss.fit(x)
 
 ## Requirements
 
+Tested on Python 3.6
+
 ```
 numpy
 scikit-learn
-scipy>=1.6
+scipy>=1.6.0
 ```

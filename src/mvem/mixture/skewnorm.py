@@ -85,7 +85,7 @@ def predict(y, mu, Sigma, lmbda):
     g = len(mu)
     prob = np.zeros((len(y), g))
     for i in range(g):
-        prob[:, i] = mvsn.pdf(y, mu[i], Sigma[i], shape[i])
+        prob[:, i] = mvsn.pdf(y, mu[i], Sigma[i], lmbda[i])
     prob = prob / np.sum(prob, axis=1)[:, None]
     return prob
 

@@ -179,7 +179,7 @@ def rvs(mu, sigma, lmbda, size=1):
     return x1 + mu.T
 
 
-def fit(x, maxiter = 100, ptol = 1e-6, ftol = np.inf, eps=0.9, return_loglike = False):
+def fit(x, maxiter = 100, ptol = 1e-6, ftol = 1e-10, eps=0.9, return_loglike = False):
     """
     Estimate the parameters of the multivariate skew normal distribution
     using an EM algorithm.
@@ -189,7 +189,7 @@ def fit(x, maxiter = 100, ptol = 1e-6, ftol = np.inf, eps=0.9, return_loglike = 
     :type x: np.ndarray
     :param maxiter: The maximum number of iterations to use in the EM algorithm.
         Defaults to 100.
-    :type nit: int, optional
+    :type maxiter: int, optional
     :param ptol: The relative convergence criterion for the estimated 
         parameters. Defaults to 1e-6.
     :type ptol: float, optional
