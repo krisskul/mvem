@@ -1,10 +1,30 @@
 import numpy as np
 from sklearn.cluster import KMeans
 import scipy
-from ..stats import multivariate_skewnorm as mvsn
+from mvem.stats import multivariate_skewnorm as mvsn
 
 def pdf(y, pi, mu, Sigma, lmbda):
-    """pdf of multivariate skew-normal mixture model."""
+    """
+    Probability density function of the multivariate skew-normal mixture model.
+
+    :param y: An array of shape (n, p) containing n observations of some
+        p-variate data with n > p.
+    :type y: np.ndarray
+    :param pi: List of weights for all groups. Length g. Elements must sum
+        to 1.
+    :type pi: np.ndarray
+    :param mu: Location parameters of the skew-normal distributions. List of
+        length g containing np.ndarrays of shape (p,).
+    :type mu: list
+    :param Sigma: Shape parameters of the skew-normal distributions. List of
+        length g containingpositive semidefinite np.ndarrays of shape (p, p).
+    :type Sigma: list
+    :param lmbda: Skewness parameters of the skew-normal distributions. List of
+        length g containing np.ndarrays of shape (p,).
+    :type lmbda: list
+    :return: The log-density at each observation.
+    :rtype: np.ndarray with shape (n,).
+    """
     g = len(pi)
     density = 0
     for j in range(g):
@@ -13,10 +33,25 @@ def pdf(y, pi, mu, Sigma, lmbda):
 
 def rvs(pi, mu, Sigma, lmbda, size=1):
     """
-    Random number generator of multivariate skew-normal
-    mixture model.
-    """
+    Random number generator of multivariate skew-normal mixture model.
 
+    :param pi: List of weights for all groups. Length g. Elements must sum
+        to 1.
+    :type pi: np.ndarray
+    :param mu: Location parameters of the skew-normal distributions. List of
+        length g containing np.ndarrays of shape (p,).
+    :type mu: list
+    :param Sigma: Shape parameters of the skew-normal distributions. List of
+        length g containingpositive semidefinite np.ndarrays of shape (p, p).
+    :type Sigma: list
+    :param lmbda: Skewness parameters of the skew-normal distributions. List of
+        length g containing np.ndarrays of shape (p,).
+    :type lmbda: list
+    :param size: The number of random numbers to generate. Defaults to 1.
+    :type size: int, optional
+    :return: The generated random numbers.
+    :rtype: np.ndarray with shape (n,p).
+    """
     w = np.random.choice(np.arange(len(pi)), p=pi, size=size)
     wi, wt = np.unique(w, return_counts=True)
     sample = []
@@ -30,8 +65,23 @@ def predict(y, mu, Sigma, lmbda):
     """
     Predict probability of cluster belonging in multivariate
     skew-normal mixture model.
-    """
 
+    :param y: An array of shape (n, p) containing n observations of some
+        p-variate data with n > p.
+    :type y: np.ndarray
+    :param mu: Location parameters of the skew-normal distributions. List of
+        length g containing np.ndarrays of shape (p,).
+    :type mu: list
+    :param Sigma: Shape parameters of the skew-normal distributions. List of
+        length g containingpositive semidefinite np.ndarrays of shape (p, p).
+    :type Sigma: list
+    :param lmbda: Skewness parameters of the skew-normal distributions. List of
+        length g containing np.ndarrays of shape (p,).
+    :type lmbda: list
+    :return: The probability of belonging to each of the g clusters, for each
+        observation.
+    :rtype: np.ndarray with shape (n, g).
+    """
     g = len(mu)
     prob = np.zeros((len(y), g))
     for i in range(g):
@@ -45,50 +95,52 @@ def fit(y, g, mu=None, Sigma=None, shape=None, pi=None, kmeans_init=True,
     """
     Fit a multivariate skew normal mixture model using an EM algorithm.
     
-    Parameters
-    ----------
-    y: np.ndarray
-        The response matrix of shape (n, p).
-    g: int
-        The number of cluster to be considered.
-    mu: list
-        (optional) A list of g arguments of vectors of initial values, with
-        shape (p,), for the location parameters.
-    Sigma: list
-        (optional) A list of g arguments of matrices of initial values, with
-        shape (p,p), for the scale parameters.
-    shape: list
-        (optional) A list of g arguments of vectors of initial values, with
-        shape (p,), for the skewness parameters.
-    pi: np.ndarray
-        (optional) A vector of initial values, with length g, for the weights
+    :param y: An array of shape (n, p) containing n observations of some
+        p-variate data with n > p.
+    :type y: np.ndarray
+    :param g: The number of cluster to be considered.
+    :type g: int
+    :param mu: Initial location parameters of the skew-normal distributions. List of
+        length g containing np.ndarrays of shape (p,).
+    :type mu: list, optional
+    :param Sigma: Initial shape parameters of the skew-normal distributions. List of
+        length g containingpositive semidefinite np.ndarrays of shape (p, p).
+    :type Sigma: list, optional
+    :param shape: Initial skewness parameters of the skew-normal distributions. List of
+        length g containing np.ndarrays of shape (p,).
+    :type shape: list, optional
+    :param pi: A vector of initial values, with length g, for the weights
         for each cluster. Must sum one.
-    kmeans_init: bool
-        If True, the initial values, which are not specified, are generated
-        via k-means. _pi_ is computed via k-means, whether specified or not.
-    k_max_iter: int
-        Maximum number of iterations of the k-means algorithm for a single run.
-        Default = 50
-    k_n_init: int
-        Number of time the k-means algorithm will be run with different centroid
-        seeds. Default = 1.
-    max_iter: int
-        The maximum number of iterations of the EM algorithm. Default = 100.
-    error: float
-        The covergence maximum error for log-likelihood.
-    uni_Gamma: bool
-        If True, the Gamma parameters are restricted to be the same for all clusters.
-    criteria: bool
-        If True, log-likelihood, AIC, DIC, EDC and ICL will be calculated.
-    group: bool
-        If True, the vector with the classification of the response is returned.
-    obs_prob: bool
-        If TRUE, the posterior probability of each observation belonging to one
-        of the g groups is reported.
-        
-    Returns
-    -------
-    dict
+    :type pi: list, optional
+    :param kmeans_init: If True, the initial values, which are not specified, are generated
+        via k-means. ``pi`` is computed via k-means, whether specified or not.
+        Defaults to True.
+    :type bool: list, optional
+    :param k_max_iter: Maximum number of iterations of the k-means algorithm
+        for a single run. Defaults to 50.
+    :type k_max_iter: int, optional
+    :param k_n_init: Number of time the k-means algorithm will be run with 
+        different centroid seeds. Defaults to 1.
+    :type k_n_init: int, optional
+    :param max_iter: The maximum number of iterations of the EM algorithm. 
+        Defaults to 100.
+    :type max_iter: int, optional
+    :param error: The covergence maximum error for log-likelihood. Defaults to 1e-4.
+    :type error: float, optional
+    :param uni_Gamma: If True, the Gamma parameters are restricted to be the same for
+        all clusters. Defaults to False.
+    :type uni_Gamma: bool, optional
+    :param criteria: If True, log-likelihood, AIC, DIC, EDC and ICL will be calculated.
+        Defaults to True.
+    :type criteria: bool, optional
+    :param group: If True, the vector with the classification of the response is returned.
+        Defaults to True.
+    :type group: bool, optional
+    :param obs_prob: If True, the posterior probability of each observation belonging to one
+        of the g groups is reported. Defaults to True.
+    :type obs_prob: bool, optional
+    :return: The fitted parameters as well as any other specified metrics.
+    :rtype: dict
     """
     
     # Initialise parameters

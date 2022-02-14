@@ -3,7 +3,21 @@ from scipy.stats import (multivariate_normal as mvn, norm)
 from scipy.stats._multivariate import _squeeze_output
 import scipy
 
-def _check_params(mu, sigma, lmbda):    
+def _check_params(mu, sigma, lmbda):
+    """
+    Internal method to check if passed in parameters are valid.
+
+    :param mu: The location parameter with shape (p,).
+    :type mu: np.ndarray
+    :param sigma: The scale parameter. A positive semi-definite array with
+        shape (p, p).
+    :type sigma: np.ndarray
+    :param lmbda: The skewness parameter with shape (p,).
+    :type lmbda: np.ndarray
+    :return: Tuple of the parameters as np.ndarrays, if no assertion error
+        occurs.
+    :rtype: tuple(np.ndarray, np.ndarray, np.ndarray)
+    """
     mu = np.asarray(mu)
     sigma = np.asarray(sigma)
     lmbda = np.asarray(lmbda)
@@ -26,14 +40,15 @@ def mean(mu, sigma, lmbda):
     """
     Mean function of the multivariate skew normal distribution.
 
-    Parameters
-    ----------
-    mu: np.ndarray or list
-        (p,) array of location parameters
-    sigma: np.ndarray or list
-        (p, p) positive semi-definite array of scale parameters
-    lmbda: np.ndarray or list
-        (p,) array of skewness parameters
+    :param mu: The location parameter with shape (p,).
+    :type mu: np.ndarray
+    :param sigma: The scale parameter. A positive semi-definite array with
+        shape (p, p).
+    :type sigma: np.ndarray
+    :param lmbda: The skewness parameter with shape (p,).
+    :type lmbda: np.ndarray
+    :return: The mean of the specified distribution.
+    :rtype: np.ndarray with shape (p,).
     """
     mu, sigma, lmbda = _check_params(mu, sigma, lmbda)    
 
@@ -46,14 +61,15 @@ def var(mu, sigma, lmbda):
     """
     Variance function of the multivariate skew normal distribution.
 
-    Parameters
-    ----------
-    mu: np.ndarray or list
-        (p,) array of location parameters
-    sigma: np.ndarray or list
-        (p, p) positive semi-definite array of scale parameters
-    lmbda: np.ndarray or list
-        (p,) array of skewness parameters
+    :param mu: The location parameter with shape (p,).
+    :type mu: np.ndarray
+    :param sigma: The scale parameter. A positive semi-definite array with
+        shape (p, p).
+    :type sigma: np.ndarray
+    :param lmbda: The skewness parameter with shape (p,).
+    :type lmbda: np.ndarray
+    :return: The variance of the specified distribution.
+    :rtype: np.ndarray with shape (p,).
     """
     mu, sigma, lmbda = _check_params(mu, sigma, lmbda)
     
@@ -66,16 +82,18 @@ def logpdf(x, mu, sigma, lmbda):
     """
     Log-probability density function of the multivariate skew normal distribution.
 
-    Parameters
-    ----------
-    x: np.ndarray
-        (n, p) array of n p-variate observations
-    mu: np.ndarray or list
-        (p,) array of location parameters
-    sigma: np.ndarray or list
-        (p, p) positive semi-definite array of scale parameters
-    lmbda: np.ndarray or list
-        (p,) array of skewness parameters
+    :param x: An array of shape (n, p) containing n observations of some
+        p-variate data with n > p.
+    :type x: np.ndarray
+    :param mu: The location parameter with shape (p,).
+    :type mu: np.ndarray
+    :param sigma: The scale parameter. A positive semi-definite array with
+        shape (p, p).
+    :type sigma: np.ndarray
+    :param lmbda: The skewness parameter with shape (p,).
+    :type lmbda: np.ndarray
+    :return: The log-density at each observation.
+    :rtype: np.ndarray with shape (p,).
     """
     mu, sigma, lmbda = _check_params(mu, sigma, lmbda)
     
@@ -91,16 +109,18 @@ def pdf(x, mu, sigma, lmbda):
     """
     Probability density function of the multivariate skew normal distribution.
 
-    Parameters
-    ----------
-    x: np.ndarray
-        (n, p) array of n p-variate observations
-    mu: np.ndarray or list
-        (p,) array of location parameters
-    sigma: np.ndarray or list
-        (p, p) positive semi-definite array of scale parameters
-    lmbda: np.ndarray or list
-        (p,) array of skewness parameters
+    :param x: An array of shape (n, p) containing n observations of some
+        p-variate data with n > p.
+    :type x: np.ndarray
+    :param mu: The location parameter with shape (p,).
+    :type mu: np.ndarray
+    :param sigma: The scale parameter. A positive semi-definite array with
+        shape (p, p).
+    :type sigma: np.ndarray
+    :param lmbda: The skewness parameter with shape (p,).
+    :type lmbda: np.ndarray
+    :return: The density at each observation.
+    :rtype: np.ndarray with shape (p,).
     """
     return np.exp(logpdf(x, mu, sigma, lmbda))
 
@@ -108,16 +128,18 @@ def loglike(x, mu, sigma, lmbda):
     """
     Log-likelihood function of the multivariate skew normal distribution.
 
-    Parameters
-    ----------
-    x: np.ndarray
-        (n, p) array of n p-variate observations
-    mu: np.ndarray or list
-        (p,) array of location parameters
-    sigma: np.ndarray or list
-        (p, p) positive semi-definite array of scale parameters
-    lmbda: np.ndarray or list
-        (p,) array of skewness parameters
+    :param x: An array of shape (n, p) containing n observations of some
+        p-variate data with n > p.
+    :type x: np.ndarray
+    :param mu: The location parameter with shape (p,).
+    :type mu: np.ndarray
+    :param sigma: The scale parameter. A positive semi-definite array with
+        shape (p, p).
+    :type sigma: np.ndarray
+    :param lmbda: The skewness parameter with shape (p,).
+    :type lmbda: np.ndarray
+    :return: The log-likelihood for given all observations and parameters.
+    :rtype: float
     """
     return np.sum(logpdf(x, mu, sigma, lmbda))
 
@@ -125,16 +147,17 @@ def rvs(mu, sigma, lmbda, size=1):
     """
     Random number generator of the multivariate skew normal distribution.
 
-    Parameters
-    ----------
-    mu: np.ndarray or list
-        (p,) array of location parameters
-    sigma: np.ndarray or list
-        (p, p) positive semi-definite array of scale parameters
-    lmbda: np.ndarray or list
-        (p,) array of skewness parameters
-    size: int
-        number of sample to draw
+    :param mu: The location parameter with shape (p,).
+    :type mu: np.ndarray
+    :param sigma: The scale parameter. A positive semi-definite array with
+        shape (p, p).
+    :type sigma: np.ndarray
+    :param lmbda: The skewness parameter with shape (p,).
+    :type lmbda: np.ndarray
+    :param size: The number of samples to draw. Defaults to 1.
+    :type size: int, optional
+    :return: The random p-variate numbers generated.
+    :rtype: np.ndarray with shape (n, p).
     """
     mu, sigma, lmbda = _check_params(mu, sigma, lmbda)
 
@@ -161,27 +184,27 @@ def fit(x, maxiter = 100, ptol = 1e-6, ftol = np.inf, eps=0.9, return_loglike = 
     Estimate the parameters of the multivariate skew normal distribution
     using an EM algorithm.
 
-    Parameters
-    ----------
-    x: np.ndarray
-        (n, p) array of n p-variate observations
-    maxiter: int
-        max nunber of iterations in the EM algorithm
-    ptol: float
-        convergence tolerance for parameters
-    ftol: float
-        convergence tolerance for log-likelihood
-    eps: float
-
-    return_loglike: boolean
-        whether to return the list of log-likelihoods
-
-    Returns
-    -------
-    mu: np.ndarray
-    scale: np.ndarray
-    nu: np.ndarray
-    log_likelihoods: list (returned if return_loglike = True)
+    :param x: An array of shape (n, p) containing n observations of some
+        p-variate data with n > p.
+    :type x: np.ndarray
+    :param maxiter: The maximum number of iterations to use in the EM algorithm.
+        Defaults to 100.
+    :type nit: int, optional
+    :param ptol: The relative convergence criterion for the estimated 
+        parameters. Defaults to 1e-6.
+    :type ptol: float, optional
+    :param ftol: The relative convergence criterion for the log-likelihood 
+        function. Defaults to np.inf.
+    :type ftol: float, optional
+    :param eps: Initialization shrinkage of delta parameter. Defaults to 0.9.
+    :type eps: float, optional
+    :param return_loglike: Return a list of log-likelihood values at each iteration. 
+        Defaults to False.
+    :type return_loglike: np.ndarray, optional
+    :return: The fitted parameters (<array> mu, <array> scale, <array> nu). Also returns
+        a list of log-likelihood values at each iteration of the EM algorithm if 
+        ``return_loglike=True``.
+    :rtype: tuple
     """
 
     def _ll(xi, n, omega_inv_half, delta):

@@ -1,8 +1,8 @@
 import numpy as np
 import scipy.stats
 from scipy.special import gammaln, kv, digamma
-from .gig import _besselM3
-from . import gig
+from mvem.stats.gig import _besselM3, _check_gig_pars
+from mvem.stats import gig
 import warnings
 
 def logpdf(x, lmbda, chi, psi, mu, sigma, gamma):
@@ -10,22 +10,23 @@ def logpdf(x, lmbda, chi, psi, mu, sigma, gamma):
     Log-probability density function of the generalised hyperbolic distribution.
     We use the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
 
-    Parameters
-    ----------
-    x: np.ndarray
-        (n, p) array of n p-variate observations
-    lmbda: float
-        lmbda is real
-    chi: float
-        chi > 0
-    psi: float
-        psi > 0
-    mu: np.ndarray or list
-        (p,) array
-    sigma: np.ndarray or list
-        (p, p) positive semi-definite array
-    gamma: np.ndarray or list
-        (p,) array
+    :param x: An array of shape (n, p) containing n observations of some
+        p-variate data with n > p.
+    :type x: np.ndarray
+    :param lmbda: Univariate parameter.
+    :type lmbda: float
+    :param chi: Univariate parameter.
+    :type chi: float
+    :param psi: Univariate parameter.
+    :type psi: float
+    :param mu: Location parameter with shape (p,).
+    :type mu: np.ndarray
+    :param sigma: A positive semi-definite array with shape (p, p).
+    :type sigma: np.ndarray
+    :param gamma: Parameter with shape (p,).
+    :type gamma: np.ndarray
+    :return: The log-density at each observation.
+    :rtype: np.ndarray with shape (n,).
     """
 
     ## Density of a multivariate generalized hyperbolic distribution.
@@ -118,22 +119,23 @@ def pdf(x, lmbda, chi, psi, mu, sigma, gamma):
     Probability density function of the generalised hyperbolic distribution.
     We use the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
 
-    Parameters
-    ----------
-    x: np.ndarray
-        (n, p) array of n p-variate observations
-    lmbda: float
-        lmbda is real
-    chi: float
-        chi > 0
-    psi: float
-        psi > 0
-    mu: np.ndarray or list
-        (p,) array
-    sigma: np.ndarray or list
-        (p, p) positive semi-definite array
-    gamma: np.ndarray or list
-        (p,) array
+    :param x: An array of shape (n, p) containing n observations of some
+        p-variate data with n > p.
+    :type x: np.ndarray
+    :param lmbda: Univariate parameter.
+    :type lmbda: float
+    :param chi: Univariate parameter.
+    :type chi: float
+    :param psi: Univariate parameter.
+    :type psi: float
+    :param mu: Location parameter with shape (p,).
+    :type mu: np.ndarray
+    :param sigma: A positive semi-definite array with shape (p, p).
+    :type sigma: np.ndarray
+    :param gamma: Parameter with shape (p,).
+    :type gamma: np.ndarray
+    :return: The density at each observation.
+    :rtype: np.ndarray with shape (n,).
     """
     return np.exp(logpdf(x, lmbda, chi, psi, mu, sigma, gamma))
 
@@ -142,46 +144,47 @@ def loglike(x, lmbda, chi, psi, mu, sigma, gamma):
     Log-likelihood function of the generalised hyperbolic distribution.
     We use the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
 
-    Parameters
-    ----------
-    x: np.ndarray
-        (n, p) array of n p-variate observations
-    lmbda: float
-        lmbda is real
-    chi: float
-        chi > 0
-    psi: float
-        psi > 0
-    mu: np.ndarray or list
-        (p,) array
-    sigma: np.ndarray or list
-        (p, p) positive semi-definite array
-    gamma: np.ndarray or list
-        (p,) array
+    :param x: An array of shape (n, p) containing n observations of some
+        p-variate data with n > p.
+    :type x: np.ndarray
+    :param lmbda: Univariate parameter.
+    :type lmbda: float
+    :param chi: Univariate parameter.
+    :type chi: float
+    :param psi: Univariate parameter.
+    :type psi: float
+    :param mu: Location parameter with shape (p,).
+    :type mu: np.ndarray
+    :param sigma: A positive semi-definite array with shape (p, p).
+    :type sigma: np.ndarray
+    :param gamma: Parameter with shape (p,).
+    :type gamma: np.ndarray
+    :return: The log-likelihood given all observations and parameters.
+    :rtype: float
     """
     return np.sum(logpdf(x, chi, lmbda, psi, mu, sigma, gamma))
 
-def rvs(lmbda, chi, psi, mu, sigma, gamma, size):
+def rvs(lmbda, chi, psi, mu, sigma, gamma, size=1):
     """
     Random number generator of the generalised hyperbolic distribution.
     We use the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
 
-    Parameters
-    ----------
-    lmbda: float
-        lmbda is real
-    chi: float
-        chi > 0
-    psi: float
-        psi > 0
-    mu: np.ndarray or list
-        (p,) array
-    sigma: np.ndarray or list
-        (p, p) positive semi-definite array
-    gamma: np.ndarray or list
-        (p,) array
-    size: int
-        number of samples to draw
+    :param lmbda: Univariate parameter.
+    :type lmbda: float
+    :param chi: Univariate parameter.
+    :type chi: float
+    :param psi: Univariate parameter.
+    :type psi: float
+    :param mu: Location parameter with shape (p,).
+    :type mu: np.ndarray
+    :param sigma: A positive semi-definite array with shape (p, p).
+    :type sigma: np.ndarray
+    :param gamma: Parameter with shape (p,).
+    :type gamma: np.ndarray
+    :param size: The number of samples to draw. Defaults to 1.
+    :type size: int, optional
+    :return: The random p-variate numbers generated.
+    :rtype: np.ndarray with shape (n, p).
     """
     d = len(mu)
     Z = scipy.stats.norm.rvs(size=size*d).reshape((-size,d))
@@ -196,20 +199,20 @@ def mean(lmbda, chi, psi, mu, sigma, gamma):
     Mean function of the generalised hyperbolic distribution. We use
     the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
 
-    Parameters
-    ----------
-    lmbda: float
-        lmbda is real
-    chi: float
-        chi > 0
-    psi: float
-        psi > 0
-    mu: np.ndarray or list
-        (p,) array
-    sigma: np.ndarray or list
-        (p, p) positive semi-definite array
-    gamma: np.ndarray or list
-        (p,) array
+    :param lmbda: Univariate parameter.
+    :type lmbda: float
+    :param chi: Univariate parameter.
+    :type chi: float
+    :param psi: Univariate parameter.
+    :type psi: float
+    :param mu: Location parameter with shape (p,).
+    :type mu: np.ndarray
+    :param sigma: A positive semi-definite array with shape (p, p).
+    :type sigma: np.ndarray
+    :param gamma: Parameter with shape (p,).
+    :type gamma: np.ndarray
+    :return: The mean of the specified distribution.
+    :rtype: np.ndarray with shape (p,).
     """
     if psi==0: # gig -> invgamma        
         if lmbda > -1:
@@ -233,20 +236,20 @@ def var(lmbda, chi, psi, mu, sigma, gamma):
     Variance function of the generalised hyperbolic distribution. We use
     the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
 
-    Parameters
-    ----------
-    lmbda: float
-        lmbda is real
-    chi: float
-        chi > 0
-    psi: float
-        psi > 0
-    mu: np.ndarray or list
-        (p,) array
-    sigma: np.ndarray or list
-        (p, p) positive semi-definite array
-    gamma: np.ndarray or list
-        (p,) array
+    :param lmbda: Univariate parameter.
+    :type lmbda: float
+    :param chi: Univariate parameter.
+    :type chi: float
+    :param psi: Univariate parameter.
+    :type psi: float
+    :param mu: Location parameter with shape (p,).
+    :type mu: np.ndarray
+    :param sigma: A positive semi-definite array with shape (p, p).
+    :type sigma: np.ndarray
+    :param gamma: Parameter with shape (p,).
+    :type gamma: np.ndarray
+    :return: The variance of the specified distribution.
+    :rtype: np.ndarray with shape (p,).
     """
     if psi==0: # gig -> invgamma
         if lmbda > -2:
@@ -269,16 +272,18 @@ def var(lmbda, chi, psi, mu, sigma, gamma):
 
     return VarW * np.outer(gamma, gamma) + EW * sigma
 
-from .gig import _check_gig_pars
-
-# from (alpha_bar, lambda) parameterisation to (chi, psi)
 def _alphabar2chipsi(alpha_bar, lmbda):
+    """
+    From (alpha_bar, lambda) parameterisation to (chi, psi)
+    """
     psi = alpha_bar * kv(lmbda+1, alpha_bar) / kv(lmbda, alpha_bar)
     chi = alpha_bar**2 / psi
     return chi, psi
 
-# loglikelihood function of the inverse gamma distribution
 def t_optfunc(thepars, delta_sum, xi_sum, n_rows):
+    """
+    Log-likelihood function of the inverse gamma distribution
+    """
     nu = -2 * (-1 - exp(thepars))
     term1 = -n.rows * nu * np.log(nu/2 - 1)/2
     term2 = (nu/2 + 1) * xi_sum + (nu/2 - 1) * delta_sum
@@ -288,14 +293,20 @@ def t_optfunc(thepars, delta_sum, xi_sum, n_rows):
 
 # loglikelihood function of the gamma distribution
 def vg_optfunc(thepars, xi_sum, eta_sum, n_rows):
+    """
+    Log-likelihood function of the gamma distribution
+    """
+
     thepars = np.exp(thepars)
     term1 = n_rows * (thepars * np.log(thepars) - gammaln(thepars))
     term2 = (thepars - 1) * xi_sum - thepars * eta_sum
     out = -(term1 + term2)
     return out
 
-# loglikelihood function of the generalized inverse gaussian distribution
 def gig_optfunc(thepars, mix_pars_fixed, pars_order, delta_sum, eta_sum, xi_sum, n_rows):
+    """
+    Log-likelihood function of the generalized inverse gaussian distribution
+    """
     out = np.nan
     tmp_pars = np.concatenate([thepars, mix_pars_fixed])
     lmbda = tmp_pars[pars_order=="lmbda"]
@@ -315,6 +326,9 @@ def gig_optfunc(thepars, mix_pars_fixed, pars_order, delta_sum, eta_sum, xi_sum,
     return out
 
 def _check_norm_pars(mu, sigma, gamma, dimension):
+    """
+    Check normal and skewness parameters  for consistency
+    """
     if len(mu) != dimension:
         raise Exception("Parameter 'mu' must be of length " + str(dimension) + "!")
     if len(gamma) != dimension:
@@ -332,6 +346,52 @@ def fitghypmv(
     standardize = False, nit = 2000, reltol = 1e-8, abstol = 1e-7, silent = False,
     opt_pars = {"lmbda": True, "alpha_bar": True, "mu": True, "sigma": True, "gamma": True}
 ):
+    """
+    Estimate the parameters of the generalised hyperbolic distribution. We use
+    the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation. Covers all special
+    cases as well.
+
+    :param x: An array of shape (n, p) containing n observations of some
+        p-variate data with n > p.
+    :type x: np.ndarray
+    :param lmbda: The intial value of lmbda. Defaults to 1.
+    :tpe lmbda: float, optional
+    :param alpha_bar: The initial value of alpha_bar. Defaults to 1.
+    :type alpha_bar: float, optional
+    :param mu: Optional initial value of mu, an array of shape (p,)
+    :type mu: np.ndarray, optional
+    :param sigma: Optional initial value of sigma, an array of shape (p,p)
+    :type sigma: np.ndarray, optional
+    :param gamma: Optional initial value of gamma, an array of shape (p,)
+    :type gamma: np.ndarray, optional
+    :param symmetric: Whether to fit a symmetric distribution or not. Default 
+        to False.
+    :type symmetric: bool, optional
+    :param standardize: Whether to standardize the data before fitting or not.
+        Default to False.
+    :type standardize: bool, optional
+    :param nit: The maximum number of iterations to use in the EM algorithm.
+        Defaults to 2000.
+    :type nit: int, optional
+    :param reltol: The relative convergence criterion for the log-likelihood 
+        function. Defaults to 1e-8.
+    :type reltol: float, optional
+    :param abstol: The relative convergence criterion for the log-likelihood 
+        function. Defaults to 1e-7.
+    :type abstol: float, optional
+    :param silent: Whether to print the log-likelihoods and parameter estimates
+        during fitting or not. Defaults to False.
+    :type silent: bool, optional
+    :param opt_pars: A dict of (lmbda, alpha_bar, mu, sigma, gamma) with boolean values,
+        denoting if the parameters should be estimated or fixed to their initial value.
+        Defaults to fitting all parameters.
+    :type opt_pars: dict, optional
+    :return: The fitted parameters (<float> lmbda, <float> alpha_bar, <array> mu, <array> sigma,
+        <array> gamma) and a list of log-likelihood values at each iteration of the EM algorithm,
+        the number of performed iterations, whether the algorithm coverged, and the final AIC.
+    :rtype: dict
+    """
+
     n, d = x.shape
     chi, psi = _alphabar2chipsi(alpha_bar, lmbda)
 
@@ -516,50 +576,49 @@ def fit(x, lmbda=1, alpha_bar=1, symmetric=False, standardize=False, nit=2000,
     Estimate the parameters of the generalised hyperbolic distribution. We
     use the (lmbda, chi, psi, mu, sigma, gamma)-parameterisation.
 
-    Parameters
-    ----------
-    x: np.ndarray
-        (n, p) array of n p-variate observations
-    lmbda: float
-        initial value of lmbda
-    alpha_bar
-        initial value of alpha_bar, a positive real number, where
-        alpha_bar = sqrt(chi * psi)
-    symmetric: boolean, optional
-        fit a symmetric distribution (default=False)
-    standardize: boolean, optional
-        standardize the data before fitting (default=False)
-    nit: int
-        maximum number of iterations in EM algorithm (default=2000)
-    reltol: float
-        relative convergence criterion for log-likelihood (default=1e-8)
-    abstol: float
-        absolute convergence criterion for log-likelihood (default=1e-7)
-    silent: boolean
-        print likelihoods during fitting (default=False)
-    flambda: float or None
-        if flmabda!=None, force lambda to flambda (default=None)
-    falpha_bar: float or None
-        if falpha_bar!=None, force alpha_bar to falpha_bar, where
-        alpha_bar = sqrt(chi * psi) (default=None)
-    fmu: float or None
-        if fmu!=None, force mu to fmu (default=None)
-    fsigma: float or None
-        if fsigma!=None, force sigma to fsigma (default=None)
-    fgamma: float or None
-        if fgamma!=None, force gamma to fgamma (default=None)
-    return_loglike: boolean
-        return log-likelihood values (default=False)
-
-    Returns
-    -------
-    lmbda: float
-    chi: float
-    psi: float
-    mu: np.ndarray
-    sigma: np.ndarray
-    gamma: np.ndarray
-    log_likelihoods: list (returned if return_loglike = True)
+    :param x: An array of shape (n, p) containing n observations of some
+        p-variate data with n > p.
+    :type x: np.ndarray
+    :param lmbda: The intial value of lmbda. Defaults to 1.
+    :tpe lmbda: float, optional
+    :param alpha_bar: The initial value of alpha_bar. Defaults to 1.
+    :type alpha_bar: float, optional
+    :param symmetric: Whether to fit a symmetric distribution or not. Default 
+        to False.
+    :type symmetric: bool, optional
+    :param standardize: Whether to standardize the data before fitting or not.
+        Default to False.
+    :type standardize: bool, optional
+    :param nit: The maximum number of iterations to use in the EM algorithm.
+        Defaults to 2000.
+    :type nit: int, optional
+    :param reltol: The relative convergence criterion for the log-likelihood 
+        function. Defaults to 1e-8.
+    :type reltol: float, optional
+    :param abstol: The relative convergence criterion for the log-likelihood 
+        function. Defaults to 1e-7.
+    :type abstol: float, optional
+    :param silent: Whether to print the log-likelihoods and parameter estimates
+        during fitting or not. Defaults to False.
+    :type silent: bool, optional
+    :param flmbda: If flmbda!=None, force lmbda to flmbda. Defaults to None.
+    :type flmbda: np.ndarray, optional
+    :param falpha_bar: If falpha_bar!=None, force alpha_bar to falpha_bar. 
+        Defaults to None.
+    :type falpha_bar: np.ndarray, optional
+    :param fmu: If fmu!=None, force mu to fmu. Defaults to None.
+    :type fmu: np.ndarray, optional
+    :param fsigma: If fsigma!=None, force sigma to fsigma. Defaults to None.
+    :type fsigma: np.ndarray, optional
+    :param fgamma: If fgamma!=None, force gamma to fgamma. Defaults to None.
+    :type fgamma: np.ndarray, optional
+    :param return_loglike: Return a list of log-likelihood values at each iteration. 
+        Defaults to False.
+    :type return_loglike: np.ndarray, optional
+    :return: The fitted parameters (<float> lmbda, <float> chi, <float> psi, <array> mu,
+        <array> sigma, <array> gamma). Also returns a list of log-likelihood values at
+        each iteration of the EM algorithm if ``return_loglike=True``.
+    :rtype: tuple
     """
 
     opt_pars = {"lmbda": flambda is None, "alpha_bar": falpha_bar is None,

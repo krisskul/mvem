@@ -4,7 +4,9 @@ from scipy.special import gammaln, kv, digamma
 
 
 def _gig_to_scipy_params_(lmbda, chi, psi):
-    """Transform from (chi, psi) parameterisations to (loc, scale)"""
+    """
+    Transform from (chi, psi) parameterisations to (loc, scale)
+    """
     p = lmbda
     b = np.sqrt(chi*psi)
     loc = 0
@@ -12,6 +14,9 @@ def _gig_to_scipy_params_(lmbda, chi, psi):
     return p, b, 0, scale
 
 def _check_gig_pars(lmbda, chi, psi):
+    """
+    Check parameter consistency.
+    """
     if (lmbda < 0) and (chi <= 0 or psi < 0):
         raise Exception("If lambda < 0: chi must be > 0 and psi must be >= 0! \n" + \
                         "lambda = " + str(lmbda) + "; chi = " + str(chi) + "; psi = " + str(psi) + "\n")
@@ -23,6 +28,21 @@ def _check_gig_pars(lmbda, chi, psi):
                         "lambda = " + str(lmbda) + "; chi = " + str(chi) + "; psi = " + str(psi) + "\n")
 
 def logpdf(x, lmbda=1, chi=1, psi=1):
+    """
+    Log-probability density function of the GIG distribution.
+
+    :param x: An array of shape (n,) containing n observations of some
+        univariate data.
+    :type x: np.ndarray
+    :param lmbda: Univariate parameter.
+    :type lmbda: float
+    :param chi: Univariate parameter.
+    :type chi: float
+    :param psi: Univariate parameter.
+    :type psi: float
+    :return: The log-density at each observation.
+    :rtype: np.ndarray with shape (n,).
+    """
     _check_gig_pars(lmbda, chi, psi)
 
     if psi==0:
@@ -39,10 +59,42 @@ def logpdf(x, lmbda=1, chi=1, psi=1):
 
 # dgig
 def pdf(x, lmbda=1, chi=1, psi=1):
+    """
+    Probability density function of the GIG distribution.
+
+    :param x: An array of shape (n,) containing n observations of some
+        univariate data.
+    :type x: np.ndarray
+    :param lmbda: Univariate parameter.
+    :type lmbda: float
+    :param chi: Univariate parameter.
+    :type chi: float
+    :param psi: Univariate parameter.
+    :type psi: float
+    :return: The density at each observation.
+    :rtype: np.ndarray with shape (n,).
+    """
+
     logdensity = logpdf(x, lmbda, chi, psi)
     return np.exp(logdensity)
 
 def logcdf(x, lmbda=1, chi=1, psi=1):
+    """
+    Log-cumulative density function of the GIG distribution.
+
+    :param x: An array of shape (n,) containing n observations of some
+        univariate data.
+    :type x: np.ndarray
+    :param lmbda: Univariate parameter.
+    :type lmbda: float
+    :param chi: Univariate parameter.
+    :type chi: float
+    :param psi: Univariate parameter.
+    :type psi: float
+    :return: The log-cumulative density at each observation.
+    :rtype: np.ndarray with shape (n,).
+    """
+
     _check_gig_pars(lmbda, chi, psi)
 
     if psi==0:
@@ -57,10 +109,41 @@ def logcdf(x, lmbda=1, chi=1, psi=1):
 
 # pgig
 def cdf(x, lmbda=1, chi=1, psi=1):
+    """
+    Cumulative density function of the GIG distribution.
+
+    :param x: An array of shape (n,) containing n observations of some
+        univariate data.
+    :type x: np.ndarray
+    :param lmbda: Univariate parameter.
+    :type lmbda: float
+    :param chi: Univariate parameter.
+    :type chi: float
+    :param psi: Univariate parameter.
+    :type psi: float
+    :return: The cumulative density at each observation.
+    :rtype: np.ndarray with shape (n,).
+    """
+
     logcdf = logcdf(x, lmbda, chi, psi)
     return np.exp(logcdf)
 
 def rvs(lmbda=1, chi=1, psi=1, size=1):
+    """
+    Random number generator of the GIG distribution.
+
+    :param lmbda: Univariate parameter.
+    :type lmbda: float
+    :param chi: Univariate parameter.
+    :type chi: float
+    :param psi: Univariate parameter.
+    :type psi: float
+    :param size: The number of samples to draw. Defaults to 1.
+    :type size: int, optional
+    :return: The random univariate numbers generated.
+    :rtype: np.ndarray with shape (n,).
+    """
+
     _check_gig_pars(lmbda, chi, psi)
 
     if psi==0:
@@ -91,6 +174,18 @@ def expect(lmbda, chi, psi, func = "x"):
     """
     Compute the expectation E[f(x)|lmbda, chi, psi],
     where f(x) is one of ["x", "logx", "1/x"].
+
+    :param lmbda: Univariate parameter.
+    :type lmbda: float
+    :param chi: Univariate parameter.
+    :type chi: float
+    :param psi: Univariate parameter.
+    :type psi: float
+    :param func: The function to compute the expectation of. One
+        of ["x", "logx", "1/x"]. Default to "x".
+    :type func: str, optional
+    :return: The expected value
+    :rtype: float
     """
     
     if func not in ["x", "logx", "1/x"]:
@@ -188,6 +283,15 @@ def var(lmbda, chi, psi):
     Handles a vector of parameters, if the different distributions all
     belong to the same group. That is, if chi==0 for one set of parameters,
     it must be so for all sets of parameters. 
+
+    :param lmbda: Univariate parameter.
+    :type lmbda: float
+    :param chi: Univariate parameter.
+    :type chi: float
+    :param psi: Univariate parameter.
+    :type psi: float
+    :return: The variance
+    :rtype: float
     """
     
     lmbda = np.asarray(lmbda)
